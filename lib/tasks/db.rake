@@ -97,7 +97,7 @@ class StdOutDemux
   end
 end
 
-class SeedData
+class SeedHelper
   def self.paths
     DiscoursePluginRegistry.seed_paths
   end
@@ -165,12 +165,12 @@ task 'multisite:migrate' => ['db:load_config', 'environment', 'set_locale'] do |
     ActiveRecord::Tasks::DatabaseTasks.migrate
   end
 
-  SeedFu.seed(SeedData.paths, /001_refresh/)
+  SeedFu.seed(SeedHelper.paths, /001_refresh/)
 
   execute_concurently(concurrency, exceptions) do |db|
 
     puts "Seeding #{db}"
-    SeedFu.seed(SeedData.paths, SeedData.filter)
+    SeedFu.seed(SeedHelper.paths, SeedHelper.filter)
 
     if !Discourse.skip_post_deployment_migrations? && ENV['SKIP_OPTIMIZE_ICONS'] != '1'
       SiteIconManager.ensure_optimized!
@@ -213,7 +213,7 @@ task 'db:migrate' => ['load_config', 'environment', 'set_locale'] do |_, args|
   end
 
   SeedFu.quiet = true
-  SeedFu.seed(SeedData.paths, SeedData.filter)
+  SeedFu.seed(SeedHelper.paths, SeedHelper.filter)
 
   if !Discourse.skip_post_deployment_migrations? && ENV['SKIP_OPTIMIZE_ICONS'] != '1'
     SiteIconManager.ensure_optimized!
